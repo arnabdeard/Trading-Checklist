@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entry Checklist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #0a0c0f;
+    --panel: #12151a;
+    --panel-2: #171b21;
+    --line: #232830;
+    --text: #e8ebef;
+    --muted: #6b7480;
+    --accent: #21e6a1;
+    --accent-dim: #14805c;
+    --amber: #e6b421;
+    --red: #e6415a;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  body{
+    display:flex;
+    justify-content:center;
+    padding: 48px 20px 80px;
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(33,230,161,0.06), transparent 40%),
+      radial-gradient(circle at 85% 10%, rgba(230,180,33,0.04), transparent 35%);
+  }
+
+  .wrap{ width:100%; max-width:640px; }
+
+  /* header */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .brand span{ color: var(--accent); }
+  .sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  #dateReadout{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-align:right;
+  }
+  #dateReadout strong{
+    display:block;
+    color: var(--text);
+    font-size: 15px;
+    font-weight:600;
+  }
+
+  /* readiness meter */
+  .meter-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .meter-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 12px;
+  }
+  .meter-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform:uppercase;
+    color: var(--muted);
+  }
+  .meter-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+  }
+  .meter-track{
+    height: 8px;
+    background: var(--panel-2);
+    border-radius: 4px;
+    overflow:hidden;
+    border: 1px solid var(--line);
+  }
+  .meter-fill{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    transition: width 0.35s ease;
+    border-radius: 4px;
+  }
+  .meter-count{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 30px;
+    font-weight: 800;
+    margin-top: 14px;
+  }
+  .meter-count span{
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* checklist */
+  .section-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 26px 0 10px 2px;
+  }
+
+  .items-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .items-grid .item{ margin-bottom: 0; height:100%; }
+
+  .item{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    cursor:pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    user-select:none;
+  }
+  .item:hover{ border-color: #2c3340; }
+  .item.checked{
+    border-color: var(--accent-dim);
+    background: linear-gradient(180deg, rgba(33,230,161,0.07), rgba(33,230,161,0.02));
+  }
+
+  .box{
+    width: 22px;
+    height: 22px;
+    min-width:22px;
+    border-radius: 6px;
+    border: 2px solid #3a4150;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: all 0.15s ease;
+  }
+  .item.checked .box{
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .box svg{ opacity:0; transform: scale(0.5); transition: all 0.15s ease; }
+  .item.checked .box svg{ opacity:1; transform: scale(1); }
+
+  .item-text{ flex:1; }
+  .item-title{ font-size: 15px; font-weight: 600; }
+  .item-desc{ font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .item-code{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  /* trade type toggle */
+  .toggle-row{
+    display:flex;
+    gap: 10px;
+  }
+  .toggle-opt{
+    flex:1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor:pointer;
+    transition: all 0.15s ease;
+    text-align:center;
+  }
+  .toggle-opt:hover{ border-color: #2c3340; }
+  .toggle-opt.active{
+    border-color: var(--accent-dim);
+    background: linear-gradient(180deg, rgba(33,230,161,0.07), rgba(33,230,161,0.02));
+  }
+  .toggle-opt .item-title{ margin-bottom: 2px; }
+
+  /* notes */
+  textarea{
+    width:100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 70px;
+  }
+  textarea:focus{ outline:none; border-color: var(--accent-dim); }
+  textarea::placeholder{ color: var(--muted); }
+
+  /* actions */
+  .actions{
+    display:flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  button{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    padding: 13px 18px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text);
+    cursor:pointer;
+    transition: all 0.15s ease;
+    flex:1;
+  }
+  button:hover{ border-color: #3a4150; }
+  #saveBtn{
+    background: var(--accent);
+    color: #06120c;
+    border-color: var(--accent);
+  }
+  #saveBtn:hover{ background: #3af0b3; }
+  #saveBtn:disabled{
+    background: var(--panel-2);
+    color: var(--muted);
+    border-color: var(--line);
+    cursor:not-allowed;
+  }
+
+  /* history */
+  .history{ margin-top: 34px; }
+  .hist-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .hist-date{ width: 88px; color: var(--muted); }
+  .hist-bar{
+    flex:1;
+    height: 5px;
+    background: var(--panel-2);
+    border-radius: 3px;
+    overflow:hidden;
+  }
+  .hist-fill{ height:100%; background: var(--accent); }
+  .hist-score{ width: 40px; text-align:right; color: var(--muted); }
+  .hist-type{
+    width: 90px;
+    text-align:right;
+    font-size:11px;
+    color: var(--muted);
+  }
+  .del-btn{
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .del-btn:hover{
+    color: var(--red);
+    border-color: var(--red);
+    background: rgba(230,65,90,0.08);
+  }
+  .pl-group{
+    display:flex;
+    gap: 4px;
+    flex: none;
+  }
+  .pl-btn{
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .pl-p:hover{ color: var(--accent); border-color: var(--accent-dim); }
+  .pl-l:hover{ color: var(--red); border-color: var(--red); }
+  .pl-m:hover{ color: var(--amber); border-color: var(--amber); }
+  .pl-p.active{
+    background: var(--accent);
+    color: #06120c;
+    border-color: var(--accent);
+  }
+  .pl-l.active{
+    background: var(--red);
+    color: #1a0508;
+    border-color: var(--red);
+  }
+  .pl-m.active{
+    background: var(--amber);
+    color: #1f1500;
+    border-color: var(--amber);
+  }
+  .hist-entry{
+    border-bottom: 1px solid var(--line);
+  }
+  .hist-entry .hist-row{
+    border-bottom: none;
+  }
+  .edit-btn{
+    flex: none;
+    width: auto;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .edit-btn:hover{ color: var(--text); border-color: #3a4150; }
+  .edit-btn.active{
+    background: var(--accent-dim);
+    color: #06120c;
+    border-color: var(--accent-dim);
+  }
+  .hist-edit-panel{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 0 4px 10px 4px;
+  }
+  .edit-item{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    padding: 6px 4px;
+    border-radius: 6px;
+    cursor:pointer;
+    transition: background 0.15s ease;
+  }
+  .edit-item:hover{ background: rgba(255,255,255,0.03); }
+  .edit-box{
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    border-radius: 5px;
+    border: 2px solid #3a4150;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: all 0.15s ease;
+  }
+  .edit-item.checked .edit-box{
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .edit-box svg{ opacity:0; transform: scale(0.5); transition: all 0.15s ease; }
+  .edit-item.checked .edit-box svg{ opacity:1; transform: scale(1); }
+  .edit-item-label{
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+  .edit-type-row{
+    display:flex;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .edit-type-opt{
+    flex:1;
+    text-align:center;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .edit-type-opt:hover{ border-color: #3a4150; }
+  .edit-type-opt.active{
+    border-color: var(--accent-dim);
+    color: var(--accent);
+    background: rgba(33,230,161,0.07);
+  }
+  .hist-notes{
+    display:block;
+    width: calc(100% - 8px);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 0 4px 12px 4px;
+    line-height: 1.45;
+    resize: none;
+    overflow: hidden;
+    min-height: 38px;
+  }
+  .hist-notes::placeholder{ color: var(--muted); }
+  .hist-notes:focus{ outline:none; border-color: var(--accent-dim); }
+  .empty-hist{
+    color: var(--muted);
+    font-size: 13px;
+    font-family:'JetBrains Mono', monospace;
+    padding: 10px 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="brand">ENTRY<span>//</span>CHECK</div>
+      <div class="sub">Pre-trade confirmation</div>
+    </div>
+    <div id="dateReadout"></div>
+  </header>
+
+  <div class="meter-card">
+    <div class="meter-top">
+      <div class="meter-label">Readiness</div>
+      <div class="meter-status" id="statusPill">NOT READY</div>
+    </div>
+    <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+    <div class="meter-count" id="meterCount">0<span>/5 confirmed</span></div>
+  </div>
+
+  <div class="section-label">Setup criteria</div>
+
+  <div class="items-grid">
+
+  <div class="item" data-key="vwap">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">VWAP checked</div>
+      <div class="item-desc">Price located relative to VWAP and noted</div>
+    </div>
+    <div class="item-code">01</div>
+  </div>
+
+  <div class="item" data-key="bos">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">Confirmed BOS / CHoCH</div>
+      <div class="item-desc">Break of structure or change of character closed and validated</div>
+    </div>
+    <div class="item-code">02</div>
+  </div>
+
+  <div class="item" data-key="fvg">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">Fair value gap present</div>
+      <div class="item-desc">FVG identified in the relevant leg</div>
+    </div>
+    <div class="item-code">03</div>
+  </div>
+
+  <div class="item" data-key="retest">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">Entry possible at retracement / level</div>
+      <div class="item-desc">A clean level or retracement zone is in play</div>
+    </div>
+    <div class="item-code">04</div>
+  </div>
+
+  <div class="item" data-key="sweep">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">Liquidity sweep</div>
+      <div class="item-desc">Prior high/low or resting liquidity taken before the move</div>
+    </div>
+    <div class="item-code">05</div>
+  </div>
+
+  <div class="item" data-key="volvol">
+    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="item-text">
+      <div class="item-title">Good volume / volatility</div>
+      <div class="item-desc">Volume and volatility support the move, not thin or erratic</div>
+    </div>
+    <div class="item-code">06</div>
+  </div>
+
+  </div>
+
+  <div class="section-label">Trade type</div>
+  <div class="toggle-row">
+    <div class="toggle-opt" data-type="continuation">
+      <div class="item-title">Continuation</div>
+      <div class="item-desc">Trading with the prevailing trend</div>
+    </div>
+    <div class="toggle-opt" data-type="reversal">
+      <div class="item-title">Reversal</div>
+      <div class="item-desc">Trading against the prior trend</div>
+    </div>
+  </div>
+
+  <div class="section-label">Notes (optional)</div>
+  <textarea id="notes" placeholder="Ticker, level, size, anything worth remembering..."></textarea>
+
+  <div class="actions">
+    <button id="resetBtn">RESET</button>
+    <button id="saveBtn">SAVE ENTRY</button>
+  </div>
+
+  <div class="history">
+    <div class="section-label">History</div>
+    <div id="historyList"></div>
+  </div>
+
+</div>
+
+<script>
+  const CRITERIA = ['vwap','bos','fvg','retest','sweep','volvol'];
+  const CRITERIA_LABELS = {
+    vwap: 'VWAP checked',
+    bos: 'Confirmed BOS / CHoCH',
+    fvg: 'Fair value gap present',
+    retest: 'Entry possible at retracement / level',
+    sweep: 'Liquidity sweep',
+    volvol: 'Good volume / volatility'
+  };
+  const todayKey = () => new Date().toISOString().slice(0,10);
+  const storageKey = 'entryChecklist_' + todayKey();
+  const historyKey = 'entryChecklist_history';
+
+  let state = {
+    vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false,
+    tradeType: null,
+    notes: ''
+  };
+
+  // load today's saved state if present
+  const saved = localStorage.getItem(storageKey);
+  if(saved){ state = JSON.parse(saved); }
+
+  function renderDate(){
+    const d = new Date();
+    const opts = { weekday:'short', month:'short', day:'numeric' };
+    document.getElementById('dateReadout').innerHTML =
+      `<strong>${d.toLocaleDateString(undefined, opts)}</strong>${d.getFullYear()}`;
+  }
+
+  function applyStateToDOM(){
+    document.querySelectorAll('.item').forEach(el=>{
+      const key = el.dataset.key;
+      el.classList.toggle('checked', !!state[key]);
+    });
+    document.querySelectorAll('.toggle-opt').forEach(el=>{
+      el.classList.toggle('active', state.tradeType === el.dataset.type);
+    });
+    document.getElementById('notes').value = state.notes || '';
+    updateMeter();
+  }
+
+  function updateMeter(){
+    const confirmed = CRITERIA.filter(k=>state[k]).length;
+    const total = CRITERIA.length + 1; // +1 for trade type selection
+    const typeSet = state.tradeType ? 1 : 0;
+    const score = confirmed + typeSet;
+
+    document.getElementById('meterCount').innerHTML = `${score}<span>/${total} confirmed</span>`;
+    document.getElementById('meterFill').style.width = (score/total*100) + '%';
+
+    const pill = document.getElementById('statusPill');
+    const saveBtn = document.getElementById('saveBtn');
+    if(score === total){
+      pill.textContent = 'READY';
+      pill.style.color = 'var(--accent)';
+      pill.style.borderColor = 'var(--accent-dim)';
+      saveBtn.disabled = false;
+    } else if (score >= total - 1){
+      pill.textContent = 'ALMOST';
+      pill.style.color = 'var(--amber)';
+      pill.style.borderColor = 'var(--amber)';
+      saveBtn.disabled = false;
+    } else {
+      pill.textContent = 'NOT READY';
+      pill.style.color = 'var(--muted)';
+      pill.style.borderColor = 'var(--line)';
+      saveBtn.disabled = false;
+    }
+  }
+
+  document.querySelectorAll('.item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.dataset.key;
+      state[key] = !state[key];
+      applyStateToDOM();
+      persistDraft();
+    });
+  });
+
+  document.querySelectorAll('.toggle-opt').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const type = el.dataset.type;
+      state.tradeType = (state.tradeType === type) ? null : type;
+      applyStateToDOM();
+      persistDraft();
+    });
+  });
+
+  document.getElementById('notes').addEventListener('input', (e)=>{
+    state.notes = e.target.value;
+    persistDraft();
+  });
+
+  function persistDraft(){
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    state = { vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false, tradeType:null, notes:'' };
+    applyStateToDOM();
+    persistDraft();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    const confirmed = CRITERIA.filter(k=>state[k]).length + (state.tradeType?1:0);
+    const total = CRITERIA.length + 1;
+
+    const criteriaSnapshot = {};
+    CRITERIA.forEach(k => criteriaSnapshot[k] = !!state[k]);
+
+    let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    history.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      date: todayKey(),
+      time: new Date().toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'}),
+      score: confirmed,
+      total: total,
+      tradeType: state.tradeType,
+      criteria: criteriaSnapshot,
+      notes: state.notes
+    });
+    history = history.slice(0, 60);
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    renderHistory();
+
+    const btn = document.getElementById('saveBtn');
+    const original = btn.textContent;
+    btn.textContent = 'SAVED ✓ — NEW ENTRY READY';
+
+    // clear storage for the current draft and reset to a fresh blank checklist
+    localStorage.removeItem(storageKey);
+    state = { vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false, tradeType:null, notes:'' };
+    applyStateToDOM();
+
+    setTimeout(()=>{ btn.textContent = original; }, 1400);
+  });
+
+  function renderHistory(){
+    let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    let needsSave = false;
+    history.forEach(h=>{
+      if(!h.id){ h.id = Date.now().toString(36) + Math.random().toString(36).slice(2,7); needsSave = true; }
+    });
+    if(needsSave){ localStorage.setItem(historyKey, JSON.stringify(history)); }
+    const container = document.getElementById('historyList');
+    if(history.length === 0){
+      container.innerHTML = '<div class="empty-hist">No saved entries yet. Save a checklist to start a log.</div>';
+      return;
+    }
+    container.innerHTML = history.map(h=>{
+      const d = new Date(h.date + 'T00:00:00');
+      const label = d.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+      const pct = (h.score/h.total*100);
+      const typeLabel = h.tradeType ? h.tradeType.toUpperCase() : '—';
+      const isP = h.outcome === 'P';
+      const isL = h.outcome === 'L';
+      const isM = h.outcome === 'M';
+      const notesVal = (h.notes || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const notesHtml = `<textarea class="hist-notes" data-id="${h.id}" placeholder="Add a note...">${notesVal}</textarea>`;
+      const crit = h.criteria || {};
+      const editCheckboxes = CRITERIA.map(k=>{
+        const checked = !!crit[k];
+        return `<div class="edit-item ${checked ? 'checked' : ''}" data-id="${h.id}" data-key="${k}">
+          <div class="edit-box"><svg width="11" height="8" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="edit-item-label">${CRITERIA_LABELS[k]}</div>
+        </div>`;
+      }).join('');
+      const editTypeToggle = `<div class="edit-type-row">
+          <div class="edit-type-opt ${h.tradeType==='continuation' ? 'active' : ''}" data-id="${h.id}" data-type="continuation">Continuation</div>
+          <div class="edit-type-opt ${h.tradeType==='reversal' ? 'active' : ''}" data-id="${h.id}" data-type="reversal">Reversal</div>
+        </div>`;
+      const editPanel = `<div class="hist-edit-panel" id="edit-${h.id}" style="display:none;">
+          ${editCheckboxes}
+          ${editTypeToggle}
+        </div>`;
+      return `<div class="hist-entry">
+      <div class="hist-row">
+        <div class="hist-date">${label}<br><span style="color:var(--muted);font-size:10px;">${h.time || ''}</span></div>
+        <div class="hist-bar"><div class="hist-fill" style="width:${pct}%"></div></div>
+        <div class="hist-score" id="score-${h.id}">${h.score}/${h.total}</div>
+        <div class="hist-type">${typeLabel}</div>
+        <div class="pl-group">
+          <button class="pl-btn pl-p ${isP ? 'active' : ''}" data-id="${h.id}" data-outcome="P" title="Mark as profit">P</button>
+          <button class="pl-btn pl-l ${isL ? 'active' : ''}" data-id="${h.id}" data-outcome="L" title="Mark as loss">L</button>
+          <button class="pl-btn pl-m ${isM ? 'active' : ''}" data-id="${h.id}" data-outcome="M" title="Mark as missed / not entered">M</button>
+        </div>
+        <button class="edit-btn" data-id="${h.id}" title="Edit checklist">EDIT</button>
+        <button class="del-btn" data-id="${h.id}" title="Delete entry" aria-label="Delete entry">&times;</button>
+      </div>
+      ${editPanel}
+      ${notesHtml}
+      </div>`;
+    }).join('');
+
+    container.querySelectorAll('.hist-notes').forEach(ta=>{
+      // auto-grow to fit content
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+
+      ta.addEventListener('input', ()=>{
+        ta.style.height = 'auto';
+        ta.style.height = ta.scrollHeight + 'px';
+      });
+
+      ta.addEventListener('blur', ()=>{
+        const id = ta.dataset.id;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(entry){
+          entry.notes = ta.value;
+          localStorage.setItem(historyKey, JSON.stringify(history));
+        }
+      });
+    });
+
+    container.querySelectorAll('.pl-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        const outcome = btn.dataset.outcome;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(entry){
+          entry.outcome = (entry.outcome === outcome) ? null : outcome;
+        }
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        renderHistory();
+      });
+    });
+
+    container.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        history = history.filter(h => h.id !== id);
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        renderHistory();
+      });
+    });
+
+    container.querySelectorAll('.edit-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.dataset.id;
+        const panel = document.getElementById('edit-' + id);
+        const open = panel.style.display !== 'none';
+        panel.style.display = open ? 'none' : 'flex';
+        btn.classList.toggle('active', !open);
+        btn.textContent = open ? 'EDIT' : 'DONE';
+      });
+    });
+
+    container.querySelectorAll('.edit-item').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const id = el.dataset.id;
+        const key = el.dataset.key;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(!entry) return;
+        entry.criteria = entry.criteria || {};
+        entry.criteria[key] = !entry.criteria[key];
+        const confirmed = CRITERIA.filter(k => entry.criteria[k]).length + (entry.tradeType ? 1 : 0);
+        entry.score = confirmed;
+        entry.total = CRITERIA.length + 1;
+        localStorage.setItem(historyKey, JSON.stringify(history));
+
+        el.classList.toggle('checked', !!entry.criteria[key]);
+        const scoreEl = document.getElementById('score-' + id);
+        if(scoreEl){ scoreEl.textContent = `${entry.score}/${entry.total}`; }
+        const bar = el.closest('.hist-entry').querySelector('.hist-fill');
+        if(bar){ bar.style.width = (entry.score/entry.total*100) + '%'; }
+      });
+    });
+
+    container.querySelectorAll('.edit-type-opt').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const id = el.dataset.id;
+        const type = el.dataset.type;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(!entry) return;
+        entry.tradeType = (entry.tradeType === type) ? null : type;
+        entry.criteria = entry.criteria || {};
+        const confirmed = CRITERIA.filter(k => entry.criteria[k]).length + (entry.tradeType ? 1 : 0);
+        entry.score = confirmed;
+        entry.total = CRITERIA.length + 1;
+        localStorage.setItem(historyKey, JSON.stringify(history));
+
+        const panel = el.closest('.hist-edit-panel');
+        panel.querySelectorAll('.edit-type-opt').forEach(o => o.classList.toggle('active', o.dataset.type === entry.tradeType));
+        const entryRow = el.closest('.hist-entry');
+        entryRow.querySelector('.hist-type').textContent = entry.tradeType ? entry.tradeType.toUpperCase() : '—';
+        const scoreEl = document.getElementById('score-' + id);
+        if(scoreEl){ scoreEl.textContent = `${entry.score}/${entry.total}`; }
+        const bar = entryRow.querySelector('.hist-fill');
+        if(bar){ bar.style.width = (entry.score/entry.total*100) + '%'; }
+      });
+    });
+  }
+
+  renderDate();
+  applyStateToDOM();
+  renderHistory();
+</script>
+
+</body>
+</html>
