@@ -8,7 +8,7 @@ No backend, no build step, no dependencies — open the HTML file in Chrome (or 
 
 ## Why this exists
 
-Most losing "textbook" setups aren't a checklist problem — they're a discipline problem. This tool exists to remove impulsive, no-confluence entries by forcing a consistent pre-trade check, and to keep an honest, reviewable log of what was actually confirmed at the moment of entry (not reconstructed afterward once you know the outcome).
+Most losing "textbook" setups aren't a checklist problem - they're a discipline problem. This tool exists to remove impulsive, no-confluence entries by forcing a consistent pre-trade check, and to keep an honest, reviewable log of what was actually confirmed at the moment of entry (not reconstructed afterward once you know the outcome).
 
 **Important:** a green checklist does not guarantee a winning trade. It filters out low-quality setups; it does not predict outcomes. Treat it as a discipline tool, not an oracle — see [Honest Limitations](#honest-limitations) below.
 
