@@ -226,6 +226,111 @@
     margin: 13px 0 5px 2px;
     font-weight: 700;
   }
+  .section-label-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin: 13px 0 5px 2px;
+  }
+  .section-label-row .section-label{ margin: 0; }
+  .criteria-actions{
+    display:flex;
+    gap: 6px;
+  }
+  .criteria-action-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .criteria-action-btn:hover{ color: var(--text); border-color: var(--accent-dim); }
+  .criteria-icon-btn{
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .criteria-action-btn.active{
+    background: var(--accent);
+    color: #06120c;
+    border-color: var(--accent);
+  }
+  .item-controls{
+    display: none;
+    gap: 4px;
+    flex: none;
+  }
+  .items-grid.edit-mode .item-controls{ display: flex; }
+  .items-grid.edit-mode .item-code{ display: none; }
+  .items-grid.edit-mode .item{ cursor: default; }
+  .item-ctrl-btn{
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .item-ctrl-btn:hover{ color: var(--text); border-color: var(--accent-dim); }
+  .item-ctrl-del:hover{ color: var(--red); border-color: var(--red); }
+  .item-ctrl-del.armed{
+    background: var(--red);
+    color: #1a0508;
+    border-color: var(--red);
+  }
+  .item-editing{
+    flex-direction: column;
+    align-items: stretch;
+    cursor: default;
+  }
+  .item-edit-fields{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .add-item-form{
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .add-item-input{
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+  }
+  .add-item-input:focus{ outline:none; border-color: var(--accent-dim); }
+  .add-item-input::placeholder{ color: var(--muted); }
+  .add-item-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
 
   .items-grid{
     display:grid;
@@ -1327,74 +1432,24 @@
     <div class="meter-count" id="meterCount">0<span>/5 confirmed</span></div>
   </div>
 
-  <div class="section-label">Setup criteria</div>
-
-  <div class="items-grid">
-
-  <div class="item" data-key="vwap">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">VWAP checked</div>
-      <div class="item-desc">Price located relative to VWAP and noted</div>
+  <div class="section-label-row">
+    <div class="section-label">Setup criteria</div>
+    <div class="criteria-actions">
+      <button id="editCriteriaBtn" class="criteria-action-btn criteria-icon-btn" title="Edit or remove checklist items">&#9998;</button>
+      <button id="addCriteriaBtn" class="criteria-action-btn criteria-icon-btn" title="Add a new checklist item">+</button>
     </div>
-    <div class="item-code">01</div>
   </div>
 
-  <div class="item" data-key="bos">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">Confirmed BOS / CHoCH</div>
-      <div class="item-desc">Break of structure or change of character closed and validated</div>
+  <div class="add-item-form" id="addItemForm" style="display:none;">
+    <input type="text" id="addItemTitle" class="add-item-input" placeholder="Item title (e.g. News avoided)">
+    <input type="text" id="addItemDesc" class="add-item-input" placeholder="Short description (optional)">
+    <div class="add-item-actions">
+      <button id="addItemCancel" class="criteria-action-btn">Cancel</button>
+      <button id="addItemSave" class="criteria-action-btn active">Save item</button>
     </div>
-    <div class="item-code">02</div>
   </div>
 
-  <div class="item" data-key="fvg">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">Fair value gap present</div>
-      <div class="item-desc">FVG identified in the relevant leg</div>
-    </div>
-    <div class="item-code">03</div>
-  </div>
-
-  <div class="item" data-key="retest">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">SL/Entry possible at retracement / level</div>
-      <div class="item-desc">A clean level or retracement zone is in play</div>
-    </div>
-    <div class="item-code">04</div>
-  </div>
-
-  <div class="item" data-key="sweep">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">Liquidity sweep</div>
-      <div class="item-desc">Prior high/low or resting liquidity taken before the move</div>
-    </div>
-    <div class="item-code">05</div>
-  </div>
-
-  <div class="item" data-key="volvol">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title">Good volume / volatility</div>
-      <div class="item-desc">Volume and volatility support the move, not thin or erratic</div>
-    </div>
-    <div class="item-code">06</div>
-  </div>
-
-  <div class="item htf-full" data-key="htf">
-    <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="item-text">
-      <div class="item-title" id="htfTitle">HTF context checked</div>
-      <div class="item-desc" id="htfDesc">Select a trade type below to see the relevant question</div>
-    </div>
-    <div class="item-code">07</div>
-  </div>
-
-  </div>
+  <div class="items-grid" id="itemsGrid"></div>
 
   <div class="section-label">Trade type</div>
   <div class="toggle-row">
@@ -1483,29 +1538,128 @@
 </div>
 
 <script>
-  const CRITERIA = ['vwap','bos','fvg','retest','sweep','volvol','htf'];
-  const CRITERIA_LABELS = {
-    vwap: 'VWAP checked',
-    bos: 'Confirmed BOS / CHoCH',
-    fvg: 'Fair value gap present',
-    retest: 'SL/Entry possible at retracement / level',
-    sweep: 'Liquidity sweep',
-    volvol: 'Good volume / volatility',
-    htf: 'HTF context checked'
-  };
+  /* ---------- Dynamic checklist items (built-in + user-added, editable) ---------- */
+  const BUILTIN_ITEMS = [
+    { key: 'vwap',   title: 'VWAP checked',                              desc: 'Price located relative to VWAP and noted' },
+    { key: 'bos',    title: 'Confirmed BOS / CHoCH',                     desc: 'Break of structure or change of character closed and validated' },
+    { key: 'fvg',    title: 'Fair value gap present',                    desc: 'FVG identified in the relevant leg' },
+    { key: 'retest', title: 'SL/Entry possible at retracement / level',  desc: 'A clean level or retracement zone is in play' },
+    { key: 'sweep',  title: 'Liquidity sweep',                           desc: 'Prior high/low or resting liquidity taken before the move' },
+    { key: 'volvol', title: 'Good volume / volatility',                  desc: 'Volume and volatility support the move, not thin or erratic' },
+    { key: 'htf',    title: 'HTF context checked',                       desc: 'Select a trade type below to see the relevant question' }
+  ];
+
+  const CUSTOM_ITEMS_KEY = 'entryChecklist_customItems';
+  const OVERRIDES_KEY = 'entryChecklist_labelOverrides';
+  const HIDDEN_BUILTINS_KEY = 'entryChecklist_hiddenBuiltins';
+
+  function loadCustomItems(){
+    try{ return JSON.parse(localStorage.getItem(CUSTOM_ITEMS_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveCustomItems(list){ localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(list)); }
+
+  function loadOverrides(){
+    try{ return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); }
+    catch(e){ return {}; }
+  }
+  function saveOverrides(obj){ localStorage.setItem(OVERRIDES_KEY, JSON.stringify(obj)); }
+
+  function loadHiddenBuiltins(){
+    try{ return JSON.parse(localStorage.getItem(HIDDEN_BUILTINS_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveHiddenBuiltins(list){ localStorage.setItem(HIDDEN_BUILTINS_KEY, JSON.stringify(list)); }
+
+  function getChecklistItems(){
+    const overrides = loadOverrides();
+    const hidden = loadHiddenBuiltins();
+    const builtin = BUILTIN_ITEMS
+      .filter(i => !hidden.includes(i.key))
+      .map(i=>{
+        const o = overrides[i.key];
+        return { key: i.key, title: o ? o.title : i.title, desc: o ? o.desc : i.desc, builtin: true };
+      });
+    const custom = loadCustomItems().map(i=> ({ key: i.key, title: i.title, desc: i.desc, builtin: false }));
+    return builtin.concat(custom);
+  }
+
+  let CRITERIA = [];
+  let CRITERIA_LABELS = {};
+  function rebuildCriteria(){
+    const items = getChecklistItems();
+    CRITERIA = items.map(i => i.key);
+    CRITERIA_LABELS = {};
+    items.forEach(i => { CRITERIA_LABELS[i.key] = i.title; });
+  }
+  rebuildCriteria();
+
   const todayKey = () => new Date().toISOString().slice(0,10);
   const storageKey = 'entryChecklist_' + todayKey();
   const historyKey = 'entryChecklist_history';
 
-  let state = {
-    vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false, htf:false,
-    tradeType: null,
-    notes: ''
-  };
+  function buildBlankState(){
+    const s = { tradeType: null, notes: '' };
+    CRITERIA.forEach(k => { s[k] = false; });
+    return s;
+  }
 
-  // load today's saved state if present
+  let state = buildBlankState();
+
+  // load today's saved state if present, merged over a fresh blank state so any
+  // checklist items added since the draft was saved still default to unchecked.
   const saved = localStorage.getItem(storageKey);
-  if(saved){ state = JSON.parse(saved); }
+  if(saved){
+    try{ state = Object.assign(buildBlankState(), JSON.parse(saved)); }
+    catch(e){ /* keep blank state on parse failure */ }
+  }
+
+  let editingItemKey = null;
+  let deleteArmedKey = null;
+
+  function renderChecklistItems(){
+    const grid = document.getElementById('itemsGrid');
+    const items = getChecklistItems();
+    grid.innerHTML = items.map((item, idx)=>{
+      const code = String(idx + 1).padStart(2, '0');
+      const fullClass = item.key === 'htf' ? ' htf-full' : '';
+      const titleId = item.key === 'htf' ? ' id="htfTitle"' : '';
+      const descId = item.key === 'htf' ? ' id="htfDesc"' : '';
+
+      if(editingItemKey === item.key){
+        const safeTitle = item.title.replace(/"/g,'&quot;');
+        const safeDesc = item.desc.replace(/"/g,'&quot;');
+        return `<div class="item item-editing${fullClass}" data-key="${item.key}">
+          <div class="item-edit-fields">
+            <input type="text" class="add-item-input item-edit-title-input" value="${safeTitle}" placeholder="Title">
+            <input type="text" class="add-item-input item-edit-desc-input" value="${safeDesc}" placeholder="Description">
+            <div class="add-item-actions">
+              <button class="criteria-action-btn item-edit-cancel" data-key="${item.key}">Cancel</button>
+              <button class="criteria-action-btn active item-edit-save" data-key="${item.key}">Save</button>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      const isDeleteArmed = deleteArmedKey === item.key;
+      const deleteBtnHtml = `<button class="item-ctrl-btn item-ctrl-del ${isDeleteArmed ? 'armed' : ''}" data-key="${item.key}" title="${isDeleteArmed ? 'Click again to confirm' : 'Remove'}">${isDeleteArmed ? '&#10003;' : '&times;'}</button>`;
+      const editBtnHtml = `<button class="item-ctrl-btn item-ctrl-edit" data-key="${item.key}" title="Edit">&#9998;</button>`;
+      const controls = `<div class="item-controls">
+             ${item.key === 'htf' ? '' : editBtnHtml}
+             ${deleteBtnHtml}
+           </div>`;
+      return `<div class="item${fullClass}" data-key="${item.key}">
+        <div class="box"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1 5L4.5 8.5L12 1" stroke="#06120c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-text">
+          <div class="item-title"${titleId}>${item.title}</div>
+          <div class="item-desc"${descId}>${item.desc}</div>
+        </div>
+        <div class="item-code">${code}</div>
+
+        ${controls}
+      </div>`;
+    }).join('');
+  }
 
   function renderDate(){
     const d = new Date();
@@ -1572,14 +1726,166 @@
     }
   }
 
-  document.querySelectorAll('.item').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const key = el.dataset.key;
-      state[key] = !state[key];
-      applyStateToDOM();
-      persistDraft();
-    });
+  let criteriaEditMode = false;
+
+  document.getElementById('itemsGrid').addEventListener('click', (e)=>{
+    const editBtn = e.target.closest('.item-ctrl-edit');
+    const delBtn = e.target.closest('.item-ctrl-del');
+    const saveBtn = e.target.closest('.item-edit-save');
+    const cancelBtn = e.target.closest('.item-edit-cancel');
+    const itemEl = e.target.closest('.item');
+    if(!itemEl) return;
+    const key = itemEl.dataset.key;
+
+    if(saveBtn){
+      const titleInput = itemEl.querySelector('.item-edit-title-input');
+      const descInput = itemEl.querySelector('.item-edit-desc-input');
+      const newTitle = titleInput.value.trim();
+      if(!newTitle){ titleInput.focus(); return; }
+      const newDesc = descInput.value.trim();
+      commitChecklistItemEdit(key, newTitle, newDesc);
+      return;
+    }
+    if(cancelBtn){
+      editingItemKey = null;
+      renderChecklistItems();
+      document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+      return;
+    }
+    if(editBtn){
+      editingItemKey = key;
+      deleteArmedKey = null;
+      renderChecklistItems();
+      document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+      const freshEl = document.querySelector(`.item[data-key="${key}"] .item-edit-title-input`);
+      if(freshEl) freshEl.focus();
+      return;
+    }
+    if(delBtn){
+      if(deleteArmedKey === key){
+        deleteChecklistItem(key);
+      } else {
+        deleteArmedKey = key;
+        renderChecklistItems();
+        document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+        setTimeout(()=>{
+          if(deleteArmedKey === key){
+            deleteArmedKey = null;
+            renderChecklistItems();
+            document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+          }
+        }, 3000);
+      }
+      return;
+    }
+    if(criteriaEditMode) return; // don't toggle checked state while editing
+
+    state[key] = !state[key];
+    applyStateToDOM();
+    persistDraft();
   });
+
+  document.getElementById('editCriteriaBtn').addEventListener('click', ()=>{
+    criteriaEditMode = !criteriaEditMode;
+    document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+    const btn = document.getElementById('editCriteriaBtn');
+    btn.classList.toggle('active', criteriaEditMode);
+    btn.innerHTML = criteriaEditMode ? '&#10003;' : '&#9998;';
+  });
+
+  document.getElementById('addCriteriaBtn').addEventListener('click', ()=>{
+    const form = document.getElementById('addItemForm');
+    const opening = form.style.display === 'none';
+    form.style.display = opening ? 'flex' : 'none';
+    if(opening){
+      document.getElementById('addItemTitle').value = '';
+      document.getElementById('addItemDesc').value = '';
+      document.getElementById('addItemTitle').focus();
+    }
+  });
+
+  document.getElementById('addItemCancel').addEventListener('click', ()=>{
+    document.getElementById('addItemForm').style.display = 'none';
+  });
+
+  function saveNewChecklistItem(){
+    const titleInput = document.getElementById('addItemTitle');
+    const descInput = document.getElementById('addItemDesc');
+    const title = titleInput.value.trim();
+    if(!title){ titleInput.focus(); return; }
+    const desc = descInput.value.trim();
+    const key = 'custom_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+
+    const customItems = loadCustomItems();
+    customItems.push({ key, title, desc });
+    saveCustomItems(customItems);
+
+    rebuildCriteria();
+    state[key] = false;
+    persistDraft();
+    renderChecklistItems();
+    applyStateToDOM();
+    document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+
+    document.getElementById('addItemForm').style.display = 'none';
+  }
+
+  document.getElementById('addItemSave').addEventListener('click', saveNewChecklistItem);
+  document.getElementById('addItemTitle').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); saveNewChecklistItem(); }
+  });
+  document.getElementById('addItemDesc').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); saveNewChecklistItem(); }
+  });
+
+  function commitChecklistItemEdit(key, newTitle, newDesc){
+    const items = getChecklistItems();
+    const item = items.find(i => i.key === key);
+    if(!item) return;
+
+    if(item.builtin){
+      const overrides = loadOverrides();
+      overrides[key] = { title: newTitle, desc: newDesc };
+      saveOverrides(overrides);
+    } else {
+      const customItems = loadCustomItems();
+      const idx = customItems.findIndex(i => i.key === key);
+      if(idx > -1){
+        customItems[idx].title = newTitle;
+        customItems[idx].desc = newDesc;
+        saveCustomItems(customItems);
+      }
+    }
+
+    editingItemKey = null;
+    rebuildCriteria();
+    renderChecklistItems();
+    document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+    applyStateToDOM();
+  }
+
+  function deleteChecklistItem(key){
+    // called only once the two-click arm/confirm pattern has already fired
+    const isBuiltin = BUILTIN_ITEMS.some(i => i.key === key);
+
+    if(isBuiltin){
+      const hidden = loadHiddenBuiltins();
+      if(!hidden.includes(key)){ hidden.push(key); }
+      saveHiddenBuiltins(hidden);
+    } else {
+      let customItems = loadCustomItems();
+      customItems = customItems.filter(i => i.key !== key);
+      saveCustomItems(customItems);
+    }
+
+    deleteArmedKey = null;
+    rebuildCriteria();
+    delete state[key];
+    persistDraft();
+    renderChecklistItems();
+    document.getElementById('itemsGrid').classList.toggle('edit-mode', criteriaEditMode);
+    applyStateToDOM();
+  }
 
   document.querySelectorAll('.toggle-opt').forEach(el=>{
     el.addEventListener('click', ()=>{
@@ -1600,7 +1906,7 @@
   }
 
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    state = { vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false, htf:false, tradeType:null, notes:'' };
+    state = buildBlankState();
     applyStateToDOM();
     persistDraft();
   });
@@ -1634,7 +1940,7 @@
 
     // clear storage for the current draft and reset to a fresh blank checklist
     localStorage.removeItem(storageKey);
-    state = { vwap:false, bos:false, fvg:false, retest:false, sweep:false, volvol:false, htf:false, tradeType:null, notes:'' };
+    state = buildBlankState();
     applyStateToDOM();
 
     setTimeout(()=>{ btn.textContent = original; }, 1400);
@@ -2050,6 +2356,7 @@
   }
 
   renderDate();
+  renderChecklistItems();
   applyStateToDOM();
   renderHistory();
 
