@@ -1,126 +1,111 @@
 # Entry//Check — Trading Entry Confluence Checklist
 
-A single-file, offline-first checklist tool for disciplined trade entries. Built around SMC/ICT-style price-action confluence (VWAP, BOS/CHoCH, FVG, liquidity sweeps, retracement entries, HTF context, and volume/volatility), with a full trade log, editable history, and a companion TradingView indicator that automates the purely structural criteria.
+A single-file, offline-first checklist and trade journal for disciplined entries. Built around SMC/ICT-style price-action confluence, with a full history log, live analytics, and export/import backup — all running from one self-contained HTML file with zero dependencies.
 
-No backend, no build step, no dependencies — open the HTML file in Chrome (or any modern browser) and it just works.
+Open the file in Chrome and it just works. No install, no server, no build step.
 
 ---
 
 ## Why this exists
 
-Most losing "textbook" setups aren't a checklist problem - they're a discipline problem. This tool exists to remove impulsive, no-confluence entries by forcing a consistent pre-trade check, and to keep an honest, reviewable log of what was actually confirmed at the moment of entry (not reconstructed afterward once you know the outcome).
+Most losing "textbook" setups aren't a checklist problem — they're a discipline problem. This tool exists to remove impulsive, no-confluence entries by forcing a consistent pre-trade check, and to keep an honest, reviewable log of what was actually confirmed at the moment of entry — not reconstructed afterward once the outcome is known.
 
-**Important:** a green checklist does not guarantee a winning trade. It filters out low-quality setups; it does not predict outcomes. Treat it as a discipline tool, not an oracle — see [Honest Limitations](#honest-limitations) below.
+**A green checklist does not guarantee a winning trade.** It filters for setup quality; it does not predict outcomes. See [Honest Limitations](#honest-limitations).
 
 ---
 
 ## Features
 
 ### Checklist
-- 7 confluence criteria per entry:
-  - **VWAP checked**
-  - **Confirmed BOS / CHoCH**
-  - **Fair value gap present**
-  - **Entry possible at retracement / level**
-  - **Liquidity sweep**
-  - **Good volume / volatility**
-  - **HTF context** — dynamically relabels itself depending on trade type:
-    - *Continuation* → "Does this align with the 4H/D trend?"
-    - *Reversal* → "Is this at a real HTF structural point (equal high/low, liquidity pool, major level)?"
+7 confluence criteria per entry:
+- **VWAP checked**
+- **Confirmed BOS / CHoCH**
+- **Fair value gap present**
+- **SL/Entry possible at retracement / level**
+- **Liquidity sweep**
+- **Good volume / volatility**
+- **HTF context** — relabels itself based on trade type:
+  - *Continuation* -> "Does this align with the 4H/D trend?"
+  - *Reversal* -> "Is this at a real HTF structural point (equal high/low, liquidity pool, major level)?"
+
+Plus:
 - **Continuation / Reversal** trade-type toggle
-- Live readiness meter (`x/8 confirmed`) with a **READY / ALMOST / NOT READY** status pill
-- Optional notes field per entry
+- Live readiness meter (x/8 confirmed) with a **READY / ALMOST / NOT READY** status pill
+- Optional notes field
+- A full-screen "NOW OR NEVER — TAKE ACTION — EXECUTE NOW" banner that fires for 15 seconds whenever a full 8/8 entry is saved, as a nudge against hesitating on your highest-quality setups
 
 ### History log
-- Every saved entry is logged with a timestamp, score, trade type, and notes
-- **Outcome tagging** per entry: **P**rofit / **L**oss / **M**issed (never entered) — kept separate so your real win rate isn't inflated by setups you saw but didn't take
-- **Fully editable after the fact** — checkboxes, trade type, and notes can all be revisited and corrected on any past entry
-- Delete any entry
-- Capped viewport (~10 entries visible) with a themed scrollbar for older history — the page doesn't grow unbounded
+- Every saved entry logs its timestamp, score, trade type, and notes
+- **Outcome tagging**: P(rofit) / L(oss) / M(issed — never entered) — kept separate so your win rate isn't inflated by setups you saw but didn't take
+- **Fully editable after the fact** — checkboxes, trade type, and notes can all be corrected on any past entry
+- **Flag important entries** with a pin marker for quick visual reference
+- **Undo on delete** — a 5-second undo toast in the bottom-right lets you recover an accidentally deleted entry
+- Capped scroll window (~10 entries visible) with a themed scrollbar
+
+### Filters
+Above the history list: filter by **trade type**, **outcome**, **date range** (From/To), and **important only** — with a live "showing X of Y" count and a one-click clear.
+
+### Stats (collapsible)
+- **Win Rate** — Profit / (Profit + Loss), missed entries excluded entirely. Red below 50%, green at/above.
+- **Missed Rate** — Missed / Total entries. Amber below 50%, red at/above.
+- **Current Win Streak** and **Best Winning Streak / Worst Losing Streak** — computed from P/L outcomes only, missed entries skipped.
+
+### Analytics (collapsible)
+- **Full Confluence (8/8)** meter — % of *all* saved entries that hit full confluence, regardless of outcome (setup-quality signal).
+- **Setup Type breakdown** — split bar showing Continuation vs Reversal share of total entries, each with its own win rate.
+- **Consistency (Taken Trades)** — % of entries you actually *executed* (P or L only) that were full 8/8. Isolates discipline at the point of pulling the trigger, separate from setup-recognition accuracy. Red below 50%.
 
 ### Special Notes
-- A separate, general-purpose sticky note box (top-right), unrelated to the checklist itself — for anything you want to jot down (session context, news, reminders)
-- Independently editable, deletable, sorted newest-first
+- A general-purpose sticky note box, independent of the checklist — for session context, reminders, anything
+- Fully editable, deletable, sorted newest-first
+- **Flag as important** (accent-colored highlight)
+- **Pin to top** — pinned notes appear in a dedicated bar directly above the header, spanning the same width as the "ENTRY//CHECK" title through today's date
 
 ### Theming
-- Dark theme (default) and light theme, toggle top-left, preference remembered across sessions
+Dark (default) and light theme, toggle top-left, preference remembered across sessions.
 
-### Storage
-- Everything persists in the browser's `localStorage` — **no account, no server, no data leaves your machine**
-- See [Data & Privacy](#data--privacy) for the tradeoffs this implies
+### Backup
+**Export** downloads your full history, Special Notes, theme preference, and current draft as a .json file. **Import** restores from a previous export, with a confirmation prompt showing exactly what will be replaced.
 
 ---
 
 ## Getting started
 
-1. Download `entry-checklist.html` from this repo
-2. Open it directly in Chrome (double-click, or drag into a browser tab)
-3. That's it — no install, no server, no build step
+1. Download entry-checklist.html (or index.html if hosted)
+2. Open it directly in Chrome — double-click, or drag into a tab
+3. That's it
 
-### Hosting it (optional)
-To access it from any device via a URL instead of a local file:
-1. Rename the file to `index.html`
-2. Push to a GitHub repo
-3. Enable **Settings → Pages → Deploy from branch (main / root)**
-4. You'll get a live URL in a minute or two
+### Hosting via GitHub Pages (optional)
+1. Rename the file to index.html
+2. Push to a repo
+3. Settings -> Pages -> Deploy from branch (main / root)
+4. Live URL in a minute or two
 
-**Note:** hosting it doesn't sync your history across devices — `localStorage` is per-browser, per-device. Opening the same URL on your phone and laptop gives you two independent, unconnected logs.
+**Note:** hosting doesn't sync history across devices — data lives in the browser's localStorage, per-browser, per-device. Two devices opening the same URL get two independent, empty-until-used logs.
 
 ---
 
 ## Data & privacy
 
-- All data (checklist history, special notes, theme preference) lives in `localStorage`, scoped to the browser you're using.
-- Clearing **"Cookies and other site data"** in your browser will wipe it. Clearing cache/history alone will not.
-- Opening the file in Incognito, a different browser, or a different device gives you a separate, empty log.
-- **There is currently no built-in backup/export.** If preserving your trade history matters to you, back it up manually (e.g. periodically copy the relevant `localStorage` keys) until an export/import feature is added.
-
----
-
-## Companion: TradingView indicator
-
-`a1-entry-checklist-indicator.pine` is a Pine Script v5 indicator that automates the four purely price-structure criteria from the checklist:
-
-| Checklist item | Automated? |
-|---|---|
-| Liquidity sweep | ✅ |
-| Confirmed BOS / CHoCH | ✅ |
-| Fair value gap present | ✅ |
-| Entry possible at retracement / level | ✅ (fires on FVG retest) |
-| VWAP checked | ❌ manual |
-| HTF context | ❌ manual |
-| Good volume / volatility | ❌ manual |
-
-It marks `LONG`/`SHORT` labels on the chart when a liquidity sweep is followed by a confirming BOS/CHoCH and price retraces back into the resulting FVG zone. VWAP, HTF context, and volume/volatility are left as manual checks by design — they require judgment the script isn't trying to replace.
-
-**Usage:** paste into TradingView's Pine Editor → "Add to chart." Backtest against your own instrument/timeframe before trusting live alerts — see [Honest Limitations](#honest-limitations).
+- All data (history, notes, theme, draft) lives in localStorage, scoped to the browser you're using — nothing leaves your machine.
+- Clearing "Cookies and other site data" wipes it. Clearing cache/history alone does not.
+- Incognito windows, a different browser, or a different device all start with an empty log.
+- **Export regularly.** There's no automatic cloud backup — the Export button is your safety net. Do it before clearing browser data, switching machines, or moving the file between drives.
 
 ---
 
 ## Honest limitations
 
-- **This is a filter, not a predictor.** A fully confirmed checklist improves the quality of candidate trades; it does not guarantee a win.
-- **The concepts used (VWAP, BOS/CHoCH, FVG, liquidity sweeps) are discretionary SMC/ICT-style frameworks**, not a peer-reviewed, statistically verified edge. Results depend heavily on execution, risk management, and market context.
-- **Editable history is a double-edged feature.** Being able to go back and correct checkboxes on old entries is useful for fixing genuine data-entry mistakes, but it also makes it possible to retroactively "improve" a log once you know the outcome. The tool is only as honest as the discipline behind using it — don't edit an entry's criteria after you already know how the trade played out.
-- **The Pine Script indicator has inherent lag.** Pivot-based structure detection can only confirm a swing high/low a few bars after it forms — same delay a human charting manually would have.
-- **No cross-device sync, no backup, single-user.** See [Data & Privacy](#data--privacy).
+- **This is a filter, not a predictor.** A confirmed checklist improves the quality of candidate trades; it does not guarantee a win.
+- **The concepts used (VWAP, BOS/CHoCH, FVG, liquidity sweeps) are discretionary SMC/ICT-style frameworks**, not a peer-reviewed, statistically verified edge. Results depend on execution, risk management, and market context.
+- **Editable history is a double-edged feature.** Going back to correct a genuine data-entry mistake is useful; retroactively "improving" a checklist after already knowing the outcome defeats the purpose of logging it. The tool is only as honest as the discipline behind using it.
+- **No cross-device sync, no automatic backup, single-user.** See Data & Privacy above.
 
 ---
 
 ## Tech stack
 
-- HTML, CSS, vanilla JavaScript — no frameworks, no build tools, no dependencies
-- `localStorage` for persistence
-- Pine Script v5 for the companion TradingView indicator
-
----
-
-## Roadmap ideas
-
-- [ ] Export/import history to/from a `.json` file for backup and cross-device transfer
-- [ ] Raise the visible history cap beyond the current ~10-entry scroll window
-- [ ] Optional backend for true cross-device sync
-- [ ] Webhook-formatted alerts from the Pine Script indicator for bot integration
+HTML, CSS, vanilla JavaScript. No frameworks, no build tools, no dependencies. localStorage for persistence.
 
 ---
 
@@ -132,4 +117,4 @@ Add your preferred license here (MIT is a common choice for a personal tool like
 
 ## Disclaimer
 
-This tool does not provide financial advice and does not guarantee trading performance. Trading involves substantial risk of loss. Use at your own discretion and always manage risk independently of any checklist or indicator output.
+This tool does not provide financial advice and does not guarantee trading performance. Trading involves substantial risk of loss. Use at your own discretion and always manage risk independently of any checklist output.
