@@ -821,6 +821,51 @@
     overflow: hidden;
     min-height: 38px;
   }
+
+  .pips-row{
+    display: flex;
+    gap: 8px;
+    margin: 0 4px 10px 4px;
+  }
+  .pips-field{
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .pips-label{
+    display: block;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .pips-input{
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0;
+  }
+  .pips-input:focus{ outline: none; }
+  .pips-capture{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .pips-capture-value{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--muted);
+  }
   .hist-notes::placeholder{ color: var(--muted); }
   .hist-notes:focus{ outline:none; border-color: var(--accent-dim); }
   .empty-hist{
@@ -2276,6 +2321,32 @@
           ${editTypeToggle}
         </div>`;
       const isImportant = !!h.important;
+      const moveVal = (h.movePips !== undefined && h.movePips !== null) ? h.movePips : '';
+      const securedVal = (h.securedPips !== undefined && h.securedPips !== null) ? h.securedPips : '';
+      let captureText = '--';
+      let captureColor = 'var(--muted)';
+      if(h.movePips !== undefined && h.movePips !== null && h.movePips !== '' &&
+         h.securedPips !== undefined && h.securedPips !== null && h.securedPips !== '' &&
+         parseFloat(h.movePips) > 0){
+        const rate = Math.round((parseFloat(h.securedPips) / parseFloat(h.movePips)) * 1000) / 10;
+        captureText = `${rate}%`;
+        captureColor = rate >= 50 ? 'var(--accent)' : (rate >= 0 ? 'var(--amber)' : 'var(--red)');
+      }
+      const showPips = h.outcome === 'P' || h.outcome === 'M';
+      const pipsRowHtml = showPips ? `<div class="pips-row">
+        <div class="pips-field">
+          <span class="pips-label">Move</span>
+          <input type="number" step="0.1" class="pips-input pips-move" data-id="${h.id}" value="${moveVal}" placeholder="pips">
+        </div>
+        <div class="pips-field">
+          <span class="pips-label">Secured</span>
+          <input type="number" step="0.1" class="pips-input pips-secured" data-id="${h.id}" value="${securedVal}" placeholder="pips">
+        </div>
+        <div class="pips-field pips-capture">
+          <span class="pips-label">Captured</span>
+          <span class="pips-capture-value" id="capture-${h.id}" style="color:${captureColor};">${captureText}</span>
+        </div>
+      </div>` : '';
       return `<div class="hist-entry ${isImportant ? 'important' : ''}" id="hist-entry-${h.id}">
       <div class="hist-row">
         <button class="hist-flag ${isImportant ? 'active' : ''}" data-id="${h.id}" title="Mark as important">&#9873;</button>
@@ -2292,6 +2363,7 @@
         <button class="del-btn" data-id="${h.id}" title="Delete entry" aria-label="Delete entry">&times;</button>
       </div>
       ${editPanel}
+      ${pipsRowHtml}
       ${notesHtml}
       </div>`;
     }).join('');
@@ -2314,6 +2386,48 @@
           entry.notes = ta.value;
           localStorage.setItem(historyKey, JSON.stringify(history));
         }
+      });
+    });
+
+    function updatePipsFor(id){
+      let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      const entry = history.find(h => h.id === id);
+      if(!entry) return;
+      localStorage.setItem(historyKey, JSON.stringify(history));
+
+      const captureEl = document.getElementById('capture-' + id);
+      if(!captureEl) return;
+      const move = parseFloat(entry.movePips);
+      const secured = parseFloat(entry.securedPips);
+      if(!isNaN(move) && move > 0 && !isNaN(secured)){
+        const rate = Math.round((secured / move) * 1000) / 10;
+        captureEl.textContent = `${rate}%`;
+        captureEl.style.color = rate >= 50 ? 'var(--accent)' : (rate >= 0 ? 'var(--amber)' : 'var(--red)');
+      } else {
+        captureEl.textContent = '--';
+        captureEl.style.color = 'var(--muted)';
+      }
+    }
+
+    container.querySelectorAll('.pips-move').forEach(input=>{
+      input.addEventListener('input', ()=>{
+        const id = input.dataset.id;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(entry){ entry.movePips = input.value === '' ? null : input.value; }
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        updatePipsFor(id);
+      });
+    });
+
+    container.querySelectorAll('.pips-secured').forEach(input=>{
+      input.addEventListener('input', ()=>{
+        const id = input.dataset.id;
+        let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const entry = history.find(h => h.id === id);
+        if(entry){ entry.securedPips = input.value === '' ? null : input.value; }
+        localStorage.setItem(historyKey, JSON.stringify(history));
+        updatePipsFor(id);
       });
     });
 
